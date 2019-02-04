@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<head>
+
+</head>
+<body>
+<canvas id="myCanvas" width="800px" height="800px" style="border:1px solid #000000; cursor: none;"></canvas>
+
+<script>
+    var cellMultipler = 10;
+
+    function drawGrid(){
+        for (var i = 0; i < canvas.width/10; i++){
+            var row = [];
+            ctx.beginPath();
+            // Horizontal
+            ctx.moveTo(i * 10, 0)
+            ctx.lineTo(i * 10, canvas.height);
+            // Vertical
+            ctx.moveTo(0, i * 10);
+            ctx.lineTo(canvas.width, i * 10);
+            ctx.stroke();
+        }
+    }
+
+
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var screen = []
+    for (var i = 0; i < canvas.width/10; i++){
+        var row = [];
+        for (var j = 0; j < canvas.height/10; j++){
+            row.push('e');
+        }
+        screen.push(row);
+        
+    }
+
+    class Cell {
+        constructor(row, column, index){
+            this.row = row;
+            this.column = column;
+            this.index = index;
+        }
+    }
+    
+
+    class GameOjb {
+        constructor(cells, rise, run, color){
+            this.rise = rise;
+            this.run = run;
+            this.cells = cells;
+            this.color = color;
+        }
+
+        draw(){
+            if (this.cells.length > 0 && this.cells[0].index === 1){
+                ctx.fillStyle = '#FF3403';
+            }
+            else{
+                ctx.fillStyle = this.color;
+            }
+            for (var i in this.cells){
+                var x = this.cells[i].row * cellMultipler;
+                var y = this.cells[i].column * cellMultipler;
+                ctx.fillRect(x, y, cellMultipler, cellMultipler);
+            }
+        }
+
+        checkCollisions(){
+
+            // Left Wall
+            var found = false;
+            for (var i in this.cells){
+                if (this.cells[i].row < 0){
+                    found = true;
+                }
+            }
+            if (found){
+                this.run *= -1;
+            }
+            // Right Wall
+            var found = false;
+            for (var i in this.cells){
+                if (this.cells[i].row > 79){
+                    found = true;
+                }
+            }
+            if (found){
+                this.run *= -1;
+            }
+            // Top Wall
+            var found = false;
+            for (var i in this.cells){
+                if (this.cells[i].column < 0){
+                    found = true;       
+                }
+            }
+            if (found){
+                this.rise = this.rise * -1;
+            }
+            // Buttom Wall
+            var found = false;
+            for (var i in this.cells){
+                if (this.cells[i].column > 79){
+                    found = true;
+                }
+            }
+            if (found){
+                this.rise = this.rise * -1;
+            }
+
+            var collisionWithOther = false;
+            var collisionCell;
+            for (var i in this.cells){
+                var cell = this.cells[i];
+                if (this.cells[i].row + this.run > -1 && this.cells[i].row + this.run < 80 && this.cells[i].column + this.rise > -1 && this.cells[i].column + this.rise < 80){
+                    if (screen[cell.row + this.run][cell.column + this.rise] != 'e' && screen[cell.row + this.run][cell.column + this.rise].index != cell.index){
+                        collisionWithOther = true;
+                        collisionCell = screen[cell.row + this.run][cell.column + this.rise];
+                    }
+                }
+            }
+            if (collisionWithOther){
+                this.rise *= -1;
+                this.run *= -1;
+                var other = objects[collisionCell.index];
+                other.rise *= -1;
+                other.run *= -1;
+            }
+        }
+
+        updatePos(){
+            var collisionWithOther = false;
+            var collisionCell;
+            for (var i in this.cells)  {
+                if (this.cells[i].row > -1 && this.cells[i].row < 80 && this.cells[i].column > -1 && this.cells[i].column < 80){
+                    screen[this.cells[i].row][this.cells[i].column] = 'e';
+                }
+
+                this.cells[i].row += this.run;
+                this.cells[i].column += this.rise;
+
+
+
+                
+                if (this.cells[i].row > -1 && this.cells[i].row < 80 && this.cells[i].column > -1 && this.cells[i].column < 80){
+                    
+                    screen[this.cells[i].row][this.cells[i].column] = this.cells[i];
+                }
+
+
+            }
+        }
+        
+    }
+
+    
+
+    class PlayerObj extends GameOjb {
+        constructor(row, column){
+            super(row, column, 'u', "#BB33FF");
+        }
+    }
+
+    class AsteroidObj extends GameOjb{
+        constructor(centerX, centerY, rise, run, size){
+            var cellIndex = objects.length;
+            var square = parseInt(Math.sqrt(size));
+            var cells = [];
+            // Creates a square
+            for (var i = 0; i < square; i++){
+                for (var j = 0; j < square; j++){
+                    cells.push(new Cell(centerX + i, centerY + j, cellIndex));
+                }
+            } 
+            // Adds the leftovers
+            var leftOver = size - (square  * square); 
+            var squareX = square + centerX;
+            var squareY = square + centerY;
+            for (var i = 0; i < leftOver/2; i++){
+                    cells.push(new Cell(squareX, centerY + i, cellIndex));
+            }
+            leftOver = parseInt(leftOver/=2);
+            for (var i = 0; i < leftOver; i++){
+                    cells.push(new Cell(centerX + i, squareY , cellIndex));
+            }
+            super(cells, rise, run, "#FF2342");
+            objects.push(this);
+        }
+    }
+    
+   
+
+
+    var objects = [];
+    var player= new PlayerObj(40,40);
+    
+    document.body.onkeydown = function(e){
+        if (e.keyCode == 32){
+            start = player.x + player.width;
+            console.log(start);
+            for (var i = start; i < start + 250; i++){
+                objects.push(new gameOjb(i, player.y, 2, 2, "#FF343"))
+            }
+            return;
+        }
+        screen[player.row][player.column] = e;
+
+
+        if (e.keyCode == 37){
+            player.row -=1;
+        }
+        if (e.keyCode == 38){
+            player.column -= 1;
+        }
+        if (e.keyCode == 39){
+            player.row +=1
+        }
+        if (e.keyCode == 40){
+            player.column += 1
+        }
+        screen[player.row][player.column] = player;
+    }
+
+ 
+    function upDateCanvas(){
+        clearCanvas();
+        drawGrid();
+        for (var i in objects){
+            objects[i].checkCollisions();
+        }
+        for (var i in objects){
+            objects[i].updatePos();
+        }
+        for (var i in objects){
+            objects[i].draw();
+        }
+        
+    }
+
+    function clearCanvas(){
+        ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    }
+
+   
+    var count = 0;
+
+    function getRandomInt(min, max){
+        var cal = Math.random() * (max - min)
+        return Math.floor(cal) +min;
+    }
+
+    function addObstacle(){
+        var size = getRandomInt(1, 16);
+        x = getRandomInt(0, 79);
+        rise = getRandomInt(-3, 0);
+        run = getRandomInt(-3, 0)
+        new AsteroidObj( x, 0, rise, run, size);
+    }
+
+   setInterval(upDateCanvas, 1)
+   setInterval(addObstacle, 2);
+
+</script>
+
+</body>
