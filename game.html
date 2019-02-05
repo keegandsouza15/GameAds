@@ -8,7 +8,7 @@
 <script>
     var canvas = document.getElementById("myCanvas");
 
-    var cellMultipler = 1;
+    var cellMultipler = 20;
     var ctx = canvas.getContext("2d");
     var screen = [];
     var objects = [];
@@ -16,10 +16,11 @@
     screenHeight = parseInt(canvas.height/cellMultipler);
 
     class Cell {
-            constructor(row, column, index){
+            constructor(row, column, index, isHole){
                 this.row = row;
                 this.column = column;
                 this.index = index;
+                this.isHole = isHole;
             }
     }
 
@@ -29,26 +30,39 @@
     for (var i = 0; i < screenWidth; i++){
         var row = [];
         for (var j = 0; j < screenHeight; j++){
-            row.push(new Cell(i, j, -1));
+            row.push(new Cell(i, j, -1, false));
         }
         screen.push(row);
     }
+    // // Hole testing
+    // for (var i = 0; i < screenWidth/2; i++){
+    //     for (var j = 0; j < screenHeight/2; j++){
+    //         screen[i][j].isHole = true;
 
+    //         ctx.fillStyle = "#0000FF";
+
+
+    //         var x = (i)  * cellMultipler;
+    //         var y = (j) * cellMultipler;
+    //         ctx.fillRect(x, y , cellMultipler, cellMultipler);
+    //     }
+    // }
 
 
    
 
     class GameOjb {
-        constructor(cells, rise, run, color){
+        constructor(cells, rise, run){
             this.rise = rise;
             this.run = run;
             this.cells = cells;
-            this.color = color;
+            //this.color = color;
         }
 
         draw(){
             ctx.fillStyle = this.color;
             for (var i in this.cells){
+                   
 
                     var x = (this.cells[i].row)  * cellMultipler;
                     var y = (this.cells[i].column) * cellMultipler;
@@ -60,11 +74,30 @@
             for (var i in this.cells){
                 var x1 = (this.cells[i].row - this.run)  * cellMultipler;
                 var y1 = (this.cells[i].column - this.rise) * cellMultipler;
-                ctx.clearRect(x1, y1, cellMultipler, cellMultipler);
+
+                
+
+
+                var a = this.cells[i].row - this.run;
+                var b = this.cells[i].column - this.rise;
+
+                var results = this.checkBorderCollisions(a,b);
+                if (results[0] == -1 || results[1] == -1){
+                    return;
+                }
+
+
+                if (screen[a][b].isHole){
+                        ctx.fillStyle = "#0000FF";
+                        ctx.fillRect(x1, y1 , cellMultipler, cellMultipler);
+                }
+                else{
+                    ctx.clearRect(x1, y1, cellMultipler, cellMultipler);
+                }
             }
         }
         checkOtherObjectCollisions(row, column, index){
-            if (screen[row][column].index !== -1 && screen[row][column].index != index){
+            if ( screen[row][column].index !== -1 && screen[row][column].index != index){
                 return true;
             }
             return false;
@@ -110,9 +143,18 @@
             }
 
             for (var i in this.cells){
-                screen[this.cells[i].row][this.cells[i].column] = new Cell(this.cells[i].row, this.cells[i].column, -1);
+                var newCell = new Cell(this.cells[i].row, this.cells[i].column, -1, this.cells[i].isHole);
+                screen[this.cells[i].row][this.cells[i].column] = newCell;
+                
+
+
+
                 this.cells[i].row += this.run;
                 this.cells[i].column += this.rise;
+
+                this.cells[i].isHole =  screen[this.cells[i].row][this.cells[i].column].isHole;
+
+                
                 screen[this.cells[i].row][this.cells[i].column] = this.cells[i];
             }
         }
@@ -121,12 +163,111 @@
 
     class PlayerObj extends GameOjb {
         constructor(row, column){
-            super(row, column, 'u', "#BB33FF");
+            var playerIndex = objects.length;
+            super([new Cell(row,column, playerIndex)], 0, 0)
+            this.dir = 'u';
+            this.fireInt = NaN;
+            this.color = "#GG3433";
         }
+
+        fire(){
+            if(this.dir == 'u'){
+                var x = this.cells[0].row;
+                var y = this.cells[0].column;
+                
+                for (var i = y; i > y - 10; i--){
+                    if (screen[x][i].index != -1){
+                        console.log(screen[x][i])
+                        var shotObj = objects[screen[x][i].index];
+                        shotObj.rise = 0;
+                        shotObj.run = 0;
+                        shotObj.color = "#0000FF";
+
+
+                        for (var i in shotObj.cells){
+                            shotObj.cells[i].isHole = true;
+                        }
+                    }
+                }
+                ctx.beginPath();
+                // Horizontal
+                ctx.moveTo((x * cellMultipler) + (cellMultipler/2), y * cellMultipler)
+                ctx.lineTo((x  * cellMultipler) + (cellMultipler/2), (y - 10) * cellMultipler);
+                ctx.stroke();
+                
+            }
+            
+        }
+
+       
+
+
+        updatePos(move, dir){
+            // Check various colliqsions
+            for (var i in this.cells){
+                var results = this.checkBorderCollisions(this.cells[i].row + this.run, this.cells[i].column + this.rise);
+                if (results[0] == -1 || results[1] == -1){
+                    alert("Game Over");
+                    this.run *= results[0];
+                    this.rise *= results[1];
+                    return;
+                }
+
+                var otherCollision = this.checkOtherObjectCollisions(this.cells[i].row + this.run, this.cells[i].column + this.rise, this.cells[i].index);
+                if (otherCollision){
+                    alert("Game Over");
+                    return;
+                }
+
+                if (dir == 'row'){
+                    if (screen[this.cells[i].row + move][this.cells[i].column].isHole == true){
+                        console.log("Game Over");
+                    }
+                }
+                else if (dir == 'col'){
+                    if (screen[this.cells[i].row][this.cells[i].column+ move].isHole == true){
+                        console.log("Game Over");
+                    }
+                }
+               
+
+            }
+            // Update the players positon
+            for (var i in this.cells){
+                if (dir =='row'){
+                    this.cells[i].row += move;
+                    if (move > 0){
+                        this.run = 1;
+                        this.rise = 0;
+                    }
+                    else{
+                        this.run = -1;
+                        this.rise = 0;
+                    }
+                }
+                else  if (dir == 'col'){
+                    this.cells[i].column += move;
+                    if (move > 0){
+                        this.rise = 1;
+                        this.run = 0;
+                    }
+                    else {
+                        this.rise = -1;
+                        this.run = 0;
+                    }
+                }
+                screen[this.cells[i].row][this.cells[i].column].index = -1;
+            }
+            for (var i in player.cells){
+                screen[this.cells[i].row][this.cells[i].column] = this.cells[i];
+            }
+        };
+        
     }
 
     class AsteroidObj extends GameOjb{
         constructor(centerX, centerY, rise, run, size){
+            size = 4;
             var cellIndex = objects.length;
             var square = parseInt(Math.sqrt(size));
             var cells = [];
@@ -134,7 +275,7 @@
             // Creates a square
             for (var i = 0; i < square; i++){
                 for (var j = 0; j < square; j++){
-                    cells.push(new Cell(centerX + i, centerY + j, cellIndex));
+                    cells.push(new Cell(centerX + i, centerY + j, cellIndex, screen[centerX + i][centerY + j].isHole));
                 }
             } 
             // Adds the leftovers
@@ -143,15 +284,18 @@
                 var squareX = square + centerX;
                 var squareY = square + centerY;
                 for (var i = 0; i < leftOver/2; i++){
-                        cells.push(new Cell(squareX, centerY + i, cellIndex));
+                    
+                    cells.push(new Cell(squareX, centerY + i, cellIndex,screen[squareX][centerY + i].isHole));
                 }
                 leftOver = parseInt(leftOver/=2);
                 for (var i = 0; i < leftOver; i++){
-                        cells.push(new Cell(centerX + i, squareY , cellIndex));
+                    cells.push(new Cell(centerX + i, squareY , cellIndex, screen[centerX + i][squareY].isHole));
                 }
             }
             
-            super(cells, rise, run, "#FF2342");
+            super(cells, rise, run);
+            this.color = "40E0D0";
+
         }
     }
 
@@ -173,26 +317,31 @@
     }
 
     document.body.onkeydown = function(e){
+        if (e.keyCode == 32){
+            player.fire();
+        }
+
         if (e.keyCode == 37){
-            player.row -=1;
+            player.updatePos(-1, 'row')
+            player.clear();
         }
         if (e.keyCode == 38){
-            player.column -= 1;
+            player.updatePos(-1, 'col')
+            player.clear();
         }
         if (e.keyCode == 39){
-            player.row +=1
+            player.updatePos(1, 'row')
+            player.clear();
         }
         if (e.keyCode == 40){
-            player.column += 1
+            player.updatePos(1, 'col')
+            player.clear();
         }
-        screen[player.row][player.column] = player;
     }
     
 
     function upDateCanvas(){
-        //ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-
-        //drawGrid();
+        
         for (var i in objects){
             objects[i].updatePos();
         }
@@ -210,15 +359,18 @@
     
 
     function addObstacle(){
-        var size = getRandomInt(20, 400);
+        var size = getRandomInt(20, 200);
         x = getRandomInt(0 + parseInt(Math.sqrt(size)), screenWidth - parseInt(Math.sqrt(size)));
         var a = new AsteroidObj( 0 , x, -1, -1, size);
         objects.push(a);
     }
 
-   setInterval(upDateCanvas, 60)
+    var player = new PlayerObj(2, 22);
+    objects.push(player);
+
+   setInterval(upDateCanvas, 100)
    addObstacle();
-   setInterval(addObstacle, 1000);
+   //setInterval(addObstacle, 1000);
 
 </script>
 
