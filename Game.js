@@ -1,6 +1,5 @@
 class Game {
-  constructor (width, height, ctx, img) {
-    this.img = img
+  constructor (width, height, ctx, scoreElement) {
     this.width = width
     this.height = height
     this.screenWidth = parseInt(width / 10)
@@ -8,6 +7,12 @@ class Game {
     this.screen = []
     this.objects = []
     this.ctx = ctx
+    this.updateScreenInterval = NaN
+    this.score = 0
+    this.scoreElement = scoreElement
+  }
+
+  start () {
     for (var i = 0; i < this.screenWidth; i++) {
       var row = []
       for (var j = 0; j < this.screenHeight; j++) {
@@ -15,13 +20,12 @@ class Game {
       }
       this.screen.push(row)
     }
-
     // Add the black background
     this.redrawBackGround()
     // Add the player
     this.player = new PlayerObj(50, 12, this.objects.length)
     this.objects.push(this.player)
-    setInterval(this.updateScreen.bind(this), 60)
+    this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 60)
     //Adds a test obstacle
     let obstancle = new ObstacleObj(10, 10, -1, -1, 4, this.objects.length)
     this.objects.push(obstancle)
@@ -29,12 +33,32 @@ class Game {
     this.objects.push(obstancle)
   }
 
+  reset () {
+    this.screen.length = 0
+    this.objects.length = 0
+    this.score = 0
+    clearInterval(this.updateScreenInterval)
+    this.start()
+  }
+
+  end () {
+    alert('GameOver')
+    this.reset()
+  }
+
+  updateScore () {
+    this.scoreElement.innerHTML = this.score
+  }
+
   updateScreen () {
     this.redrawBackGround()
-    this.redraw += 1
+    this.updateScore()
+    this.score += 1
     for (let obj of this.objects) {
       obj.clear(this.ctx, 10, this.screen)
-      obj.updatePos(this.screen, this.screenWidth, this.screenHeight)
+      if (!obj.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+        this.end () 
+      }
       obj.draw(this.ctx, 10, this.img)
     }
   }
@@ -113,7 +137,6 @@ class GameObj {
     for (let cell of this.cells) {
       // Checks collisions with walls
       if (this.leftRightBorderCollision(cell.row + this.run, screenWidth)) {
-        console.log(cell.row, screenWidth)
         this.run *= -1
         borderCollision = true
       }
@@ -121,16 +144,22 @@ class GameObj {
         this.rise *= -1
         borderCollision = true
       }
-      if (borderCollision) return
+      if (borderCollision) return true
       //Checks collisions with other objects
       if (this.checkOtherObjectCollision(cell.row + this.run, cell.column + this.rise, screen)) {
-        console.log('bang')
-        this.run *= -1
-        this.rise *= -1
-        return
+        if (screen[cell.row + this.run][cell.column + this.rise].index === 0) {
+          console.log(this.index)
+          console.log('here')
+          return false
+        } else {
+          this.run *= -1
+          this.rise *= -1
+          return true
+        }
       }
     }
 
+    // Updates the cells position and store it in a the screen data structure.
     for (let cell of this.cells) {
       let newCell = new Cell(cell.row, cell.column, -1)
       screen[cell.row][cell.column] = newCell
@@ -139,6 +168,7 @@ class GameObj {
 
       screen[cell.row][cell.column] = cell
     }
+    return true
   }
 }
 
@@ -163,6 +193,9 @@ class PlayerObj extends GameObj {
 
   updatePos (screen, screenWidth, screenHeight) {
     let cell = this.cells[0]
+    // Resets the screen
+    screen[cell.row][cell.column] = new Cell(cell.row, cell.col, -1)
+    // Adds the rise and the run
     cell.row += this.run
     cell.column += this.rise
     this.rise = 0
@@ -170,6 +203,8 @@ class PlayerObj extends GameObj {
     // Checks collisions with walls
     if (this.leftRightBorderCollision(cell.row, screenWidth)) return false
     if (this.topButtomBorderCollision(cell.column, screenHeight)) return false
+    // Check collisions with other objects
+    if (this.checkOtherObjectCollision(cell.row, cell.column, screen)) return false
     screen[cell.row][cell.column] = cell
     this.cells[0] = cell
     return true
