@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+  <title>Testing</title>
+  <script src="Game.js"></script>
+</head>
+
+<body style="background:white">
+    <p style="color:red"> This is my text it is red</p>
+    <div style="background: blue; width: 400px; height: 400px;">
+    
+    </div>
+    <canvas id="gameCanvas" width="800px" height="800px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
+    <img hidden=true id="myimg" src="rsz_red_circle.jpg"></img>
+    <!-- <img id="transparentimg" src="transpartent.jpg"></img> -->
+    <script >
+      let canvas = document.getElementById('gameCanvas')
+      let ctx = canvas.getContext('2d')
+      let myimg = document.getElementById('myimg')
+      let game = new Game(800, 800, ctx, myimg)
+      myimg.style.width = '10px'
+      document.body.onkeydown = function (e) {
+        if (e.keyCode == 37){
+          game.player.clear(ctx, 10)
+          game.player.run = -1
+          game.player.rise = 0
+          if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)){
+            game.player.draw (ctx, 10, myimg)
+          } else {
+            alert('Game Over')
+          }
+        }
+        if (e.keyCode == 38){
+          game.player.clear(ctx, 10)
+          game.player.run = 0
+          game.player.rise = -1
+          if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
+            game.player.draw (ctx, 10, myimg)
+          } else {
+            alert('Game Over')
+          }
+        }
+        if (e.keyCode == 39){
+          game.player.clear(ctx, 10)
+          game.player.run = 1
+          game.player.rise = 0 
+          if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
+            game.player.draw (ctx, 10, myimg)
+          } else {
+            alert('Game Over')
+          }
+        }
+        if (e.keyCode == 40){
+          game.player.clear(ctx, 10)
+          game.player.run = 0
+          game.player.rise = 1
+          if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight))  {
+            game.player.draw (ctx, 10, myimg)
+          } else {
+            alert('Game Over')
+          }
+        }
+      }
+    </script>
+</body>
