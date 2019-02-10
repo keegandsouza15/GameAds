@@ -4,19 +4,24 @@
   <script src="Game.js"></script>
 </head>
 
-<body style="background:white">
-    <p style="color:red"> This is my text it is red</p>
-    <div style="background: blue; width: 400px; height: 400px;">
+<body style="background:white;">
+    <video id='test_video' width="1000" height="1000" controls>
+      <source src="test3.mp4" type="video/mp4">
+    </video>
+   
     
     </div>
-    <canvas id="gameCanvas" width="800px" height="800px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
+    <canvas id="gameCanvas" width="1000px" height="1000px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
     <p id="score">Shit</p>
-    <script >
+    <script>
+      // For testing 
+      let vid = document.getElementById('test_video')
+      vid.play()
       let scoreText = document.getElementById('score')
       let canvas = document.getElementById('gameCanvas')
       let ctx = canvas.getContext('2d')
       let myimg = document.getElementById('myimg')
-      let game = new Game(800, 800, ctx, scoreText)
+      let game = new Game(canvas.width, canvas.height, ctx, scoreText)
       game.start()
       document.body.onkeydown = function (e) {
         if (e.keyCode == 37){

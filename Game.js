@@ -26,7 +26,7 @@ class Game {
     this.player = new PlayerObj(50, 12, this.objects.length)
     this.objects.push(this.player)
     this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 60)
-    //Adds a test obstacle
+    // Adds a test obstacle
     let obstancle = new ObstacleObj(10, 10, -1, -1, 4, this.objects.length)
     this.objects.push(obstancle)
     obstancle = new ObstacleObj(1, 1, -1, -1, 4, this.objects.length)
@@ -57,7 +57,7 @@ class Game {
     for (let obj of this.objects) {
       obj.clear(this.ctx, 10, this.screen)
       if (!obj.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.end () 
+        this.end() 
       }
       obj.draw(this.ctx, 10, this.img)
     }
@@ -66,16 +66,15 @@ class Game {
   redrawBackGround () {
     this.ctx.globalCompositeOperation = 'source-over'
     this.ctx.fillStyle = 'black'
-    this.ctx.fillRect(0, 0, 800, 800)
+    this.ctx.fillRect(0, 0, this.width, this.height)
   }
 }
 
 class Cell {
-  constructor (row, column, index, isHole) {
+  constructor (row, column, index) {
     this.row = row
     this.column = column
     this.index = index
-    this.isHole = isHole
   }
 }
 
@@ -99,17 +98,19 @@ class GameObj {
     return (screen[row][column].index !== -1 && screen[row][column].index !== this.index)
   }
 
-  draw (ctx, cellMultipler, img) {
+  draw (ctx, cellMultipler) {
     ctx.fillStyle = '#FF2332'
     for (let cell of this.cells) {
       let x = (cell.row) * cellMultipler
       let y = (cell.column) * cellMultipler
+      // Draw the border circle
       ctx.globalCompositeOperation = 'source-over'
       ctx.globalAlpha = 0.8
       ctx.beginPath()
       ctx.arc(x + 5, y + 5, 5, 0, 2 * Math.PI, false)
       ctx.fillStyle = 'red'
       ctx.fill()
+      // Draw the inner circle
       ctx.globalCompositeOperation = 'destination-out'
       ctx.globalAlpha = 1
       ctx.beginPath()
@@ -120,6 +121,7 @@ class GameObj {
   }
 
   clear (ctx, cellMultipler) {
+    // ReFill the circle
     ctx.fillStyle = 'pink'
     ctx.globalAlpha = 0.2
     ctx.globalCompositeOperation = 'source-over'
@@ -145,11 +147,9 @@ class GameObj {
         borderCollision = true
       }
       if (borderCollision) return true
-      //Checks collisions with other objects
+      // Checks collisions with other objects
       if (this.checkOtherObjectCollision(cell.row + this.run, cell.column + this.rise, screen)) {
         if (screen[cell.row + this.run][cell.column + this.rise].index === 0) {
-          console.log(this.index)
-          console.log('here')
           return false
         } else {
           this.run *= -1
@@ -165,7 +165,6 @@ class GameObj {
       screen[cell.row][cell.column] = newCell
       cell.row += this.run
       cell.column += this.rise
-
       screen[cell.row][cell.column] = cell
     }
     return true
@@ -177,7 +176,7 @@ class PlayerObj extends GameObj {
     super(0, 0, [new Cell(row, column, playerIndex, false)], playerIndex)
   }
 
-  draw (ctx, cellMultipler, img) {
+  draw (ctx, cellMultipler) {
     ctx.fillStyle = '#FF2332'
     for (let cell of this.cells) {
       let x = (cell.row) * cellMultipler
