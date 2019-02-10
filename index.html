@@ -5,14 +5,15 @@
 </head>
 
 <body style="background:white;">
-    <video id='test_video' width="1000" height="1000" controls>
+    <video style="position: absolute; top: 0px; left: 0px;" id='test_video' width="1080" height="720" controls>
       <source src="test3.mp4" type="video/mp4">
     </video>
    
     
     </div>
-    <canvas id="gameCanvas" width="1000px" height="1000px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
+    <canvas id="gameCanvas" width="1080px" height="720px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
     <p id="score">Shit</p>
+    <button onclick=resize() style="position: absolute; buttom:0px" id=resize_button>Click me</button>
     <script>
       // For testing 
       let vid = document.getElementById('test_video')
@@ -22,44 +23,60 @@
       let ctx = canvas.getContext('2d')
       let myimg = document.getElementById('myimg')
       let game = new Game(canvas.width, canvas.height, ctx, scoreText)
+      
+      ctx.canvas.width = window.innerWidth
+      ctx.canvas.height = window.innerHeight
+
+      function resize () {
+        console.log('here')
+        vid.width = 1333
+        vid.height = 600
+        vid.load()
+        vid.play()
+        canvas.width = vid.width
+        canvas.height = vid.height
+        game.resize(vid.width, vid.height)
+
+      }
+
       game.start()
       document.body.onkeydown = function (e) {
         if (e.keyCode == 37){
-          game.player.clear(ctx, 10)
+          game.player.clear(ctx, this.cellMultipler)
           game.player.run = -1
           game.player.rise = 0
           if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)){
-            game.player.draw (ctx, 10, myimg)
+            game.player.draw (ctx, this.cellMultipler)
           } else {
             game.end()
           }
         }
         if (e.keyCode == 38){
-          game.player.clear(ctx, 10)
+          game.player.clear(ctx,this.cellMultipler )
           game.player.run = 0
           game.player.rise = -1
           if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
-            game.player.draw (ctx, 10, myimg)
+            game.player.draw (ctx, this.cellMultipler)
           } else {
             game.end()
           }
         }
         if (e.keyCode == 39){
-          game.player.clear(ctx, 10)
+          game.player.clear(ctx, this.cellMultipler)
           game.player.run = 1
           game.player.rise = 0 
           if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
-            game.player.draw (ctx, 10, myimg)
+            game.player.draw (ctx, this.cellMultipler)
           } else {
             game.end()
           }
         }
         if (e.keyCode == 40){
-          game.player.clear(ctx, 10)
+          game.player.clear(ctx, this.cellMultipler)
           game.player.run = 0
           game.player.rise = 1
           if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight))  {
-            game.player.draw (ctx, 10, myimg)
+            game.player.draw (ctx, this.cellMultipler)
           } else {
             game.end()
           }

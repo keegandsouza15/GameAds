@@ -2,14 +2,24 @@ class Game {
   constructor (width, height, ctx, scoreElement) {
     this.width = width
     this.height = height
-    this.screenWidth = parseInt(width / 10)
-    this.screenHeight = parseInt(height / 10)
+    this.screenWidth = 108
+    this.cellMultipler = this.width / this.screenWidth
+    this.screenHeight = parseInt(this.height / this.cellMultipler)
     this.screen = []
     this.objects = []
     this.ctx = ctx
     this.updateScreenInterval = NaN
     this.score = 0
     this.scoreElement = scoreElement
+    console.log(parseInt(this.height / this.cellMultipler))
+  }
+
+  resize (width, height) {
+    this.width = width
+    this.height = height
+    this.cellMultipler = this.width / this.screenWidth
+    this.screenHeight = parseInt(this.height / this.cellMultipler)
+    console.log(this.width, this.height, this.screenHeight)
   }
 
   start () {
@@ -42,7 +52,7 @@ class Game {
   }
 
   end () {
-    alert('GameOver')
+    window.alert('GameOver')
     this.reset()
   }
 
@@ -55,11 +65,11 @@ class Game {
     this.updateScore()
     this.score += 1
     for (let obj of this.objects) {
-      obj.clear(this.ctx, 10, this.screen)
+      obj.clear(this.ctx, this.cellMultipler, this.screen)
       if (!obj.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.end() 
+        this.end()
       }
-      obj.draw(this.ctx, 10, this.img)
+      obj.draw(this.ctx, this.cellMultipler)
     }
   }
 
@@ -100,6 +110,7 @@ class GameObj {
 
   draw (ctx, cellMultipler) {
     ctx.fillStyle = '#FF2332'
+    let radius = cellMultipler / 2
     for (let cell of this.cells) {
       let x = (cell.row) * cellMultipler
       let y = (cell.column) * cellMultipler
@@ -107,14 +118,14 @@ class GameObj {
       ctx.globalCompositeOperation = 'source-over'
       ctx.globalAlpha = 0.8
       ctx.beginPath()
-      ctx.arc(x + 5, y + 5, 5, 0, 2 * Math.PI, false)
+      ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
       ctx.fillStyle = 'red'
       ctx.fill()
       // Draw the inner circle
       ctx.globalCompositeOperation = 'destination-out'
       ctx.globalAlpha = 1
       ctx.beginPath()
-      ctx.arc(x + 5, y + 5, 4.5, 0, 2 * Math.PI, false)
+      ctx.arc(x + radius, y + radius, radius - 0.5, 0, 2 * Math.PI, false)
       ctx.fillStyle = 'green'
       ctx.fill()
     }
@@ -122,6 +133,7 @@ class GameObj {
 
   clear (ctx, cellMultipler) {
     // ReFill the circle
+    let radius = cellMultipler / 2
     ctx.fillStyle = 'pink'
     ctx.globalAlpha = 0.2
     ctx.globalCompositeOperation = 'source-over'
@@ -129,7 +141,7 @@ class GameObj {
       let x = cell.row * cellMultipler
       let y = cell.column * cellMultipler
       ctx.beginPath()
-      ctx.arc(x + 5, y + 5, 5, 0, 2 * Math.PI, false)
+      ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
       ctx.fill()
     }
   }
@@ -177,6 +189,7 @@ class PlayerObj extends GameObj {
   }
 
   draw (ctx, cellMultipler) {
+    let radius = cellMultipler / 2
     ctx.fillStyle = '#FF2332'
     for (let cell of this.cells) {
       let x = (cell.row) * cellMultipler
@@ -184,7 +197,7 @@ class PlayerObj extends GameObj {
       ctx.globalCompositeOperation = 'source-over'
       ctx.globalAlpha = 0.8
       ctx.beginPath()
-      ctx.arc(x + 5, y + 5, 5, 0, 2 * Math.PI, false)
+      ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
       ctx.fillStyle = 'red'
       ctx.fill()
     }
