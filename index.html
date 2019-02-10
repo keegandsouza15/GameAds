@@ -5,15 +5,13 @@
 </head>
 
 <body style="background:white;">
-    <video style="position: absolute; top: 0px; left: 0px;" id='test_video' width="1080" height="720" controls>
-      <source src="test3.mp4" type="video/mp4">
+    <video id='test_video' width="1080" height="720" controls>
+      <source  src="test3.mp4" type="video/mp4">
     </video>
    
-    
-    </div>
-    <canvas id="gameCanvas" width="1080px" height="720px" style="color: black; border:1px solid #000000; position: absolute; top: 0px; left:0px; opacity: .9"></canvas>
+    <canvas style="position: absolute; top: 0px; left: 10px"  id="gameCanvas" width="1080px" height="720px" style="color: black; border:1px solid #000000; opacity: .9"></canvas>
     <p id="score">Shit</p>
-    <button onclick=resize() style="position: absolute; buttom:0px" id=resize_button>Click me</button>
+    <button onclick=resize() style="position: absolute; bottom:0px" id=resize_button>Click me</button>
     <script>
       // For testing 
       let vid = document.getElementById('test_video')
@@ -24,19 +22,41 @@
       let myimg = document.getElementById('myimg')
       let game = new Game(canvas.width, canvas.height, ctx, scoreText)
       
-      ctx.canvas.width = window.innerWidth
-      ctx.canvas.height = window.innerHeight
+      // ctx.canvas.width = window.innerWidth
+      // ctx.canvas.height = window.innerHeight
 
       function resize () {
-        console.log('here')
-        vid.width = 1333
-        vid.height = 600
-        vid.load()
-        vid.play()
-        canvas.width = vid.width
-        canvas.height = vid.height
-        game.resize(vid.width, vid.height)
+        var ptest = document.createElement('b')
+        ptest.innerHTML += "Hello"
+        document.body.prepend(ptest)
 
+        // vid.width = Math.floor(Math.random () * 1000) + 100
+        // vid.height = Math.floor(Math.random () * 500) + 100
+        // vid.style.top = Math.floor(Math.random () * 500) + 100
+        // vid.style.left = Math.floor(Math.random () * 100) + 100
+        console.log(vid.getBoundingClientRect().x, vid.getBoundingClientRect().y)
+       let vidBound = vid.getBoundingClientRect()
+        
+        document.body.removeChild(document.getElementById('gameCanvas'))
+        
+        ctx.clearRect(0,0, canvas.width, canvas.height)
+        var newCanvas = document.createElement('canvas')
+        newCanvas.style.color = 'black'
+        newCanvas.style.border = '1px solid #000000'
+       
+        // newCanvas.style.top =   //parseInt(vidBound.x)
+        // newCanvas.style.left =  //parseInt(vidBound.y)
+        newCanvas.style.opacity = '.9'
+        newCanvas.width = vid.width
+        newCanvas.height = vid.height
+        newCanvas.setAttribute('id', 'gameCanvas')
+        newCanvas.style.top = vidBound.y + "px"
+        newCanvas.style.left = vidBound.x + "px"
+        newCanvas.style.position = 'absolute'
+        game.ctx = newCanvas.getContext('2d')
+        document.body.append(newCanvas)
+
+        game.resize(vid.width, vid.height)
       }
 
       game.start()

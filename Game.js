@@ -11,7 +11,6 @@ class Game {
     this.updateScreenInterval = NaN
     this.score = 0
     this.scoreElement = scoreElement
-    console.log(parseInt(this.height / this.cellMultipler))
   }
 
   resize (width, height) {
@@ -19,6 +18,7 @@ class Game {
     this.height = height
     this.cellMultipler = this.width / this.screenWidth
     this.screenHeight = parseInt(this.height / this.cellMultipler)
+    this.reset()
     console.log(this.width, this.height, this.screenHeight)
   }
 
