@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name" : "Test Chrome Extension",
+  "version" : "0.1",
+  "content_scripts" : [
+    {
+      "matches" : [
+        "*://www.youtube.com/*",
+        "*://youtube.com/*"
+      ],
+      "js" : ["content.js"]
+    }
+  ]
+}

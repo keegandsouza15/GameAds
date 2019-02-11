@@ -22,19 +22,13 @@
       let myimg = document.getElementById('myimg')
       let game = new Game(canvas.width, canvas.height, ctx, scoreText)
       
-      // ctx.canvas.width = window.innerWidth
-      // ctx.canvas.height = window.innerHeight
 
       function resize () {
         var ptest = document.createElement('b')
         ptest.innerHTML += "Hello"
         document.body.prepend(ptest)
 
-        // vid.width = Math.floor(Math.random () * 1000) + 100
-        // vid.height = Math.floor(Math.random () * 500) + 100
-        // vid.style.top = Math.floor(Math.random () * 500) + 100
-        // vid.style.left = Math.floor(Math.random () * 100) + 100
-        console.log(vid.getBoundingClientRect().x, vid.getBoundingClientRect().y)
+        
        let vidBound = vid.getBoundingClientRect()
         
         document.body.removeChild(document.getElementById('gameCanvas'))
@@ -44,8 +38,7 @@
         newCanvas.style.color = 'black'
         newCanvas.style.border = '1px solid #000000'
        
-        // newCanvas.style.top =   //parseInt(vidBound.x)
-        // newCanvas.style.left =  //parseInt(vidBound.y)
+        
         newCanvas.style.opacity = '.9'
         newCanvas.width = vid.width
         newCanvas.height = vid.height
