@@ -78,6 +78,51 @@ class Game {
     this.ctx.fillStyle = 'black'
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
+
+  buttonPressed (e) {
+    let keyCode = e.keyCode
+    if (keyCode === 37) {
+      this.player.clear(this.ctx, this.cellMultipler)
+      this.player.run = -1
+      this.player.rise = 0
+      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+        this.player.draw(this.ctx, this.cellMultipler)
+      } else {
+        return false
+      }
+    }
+    if (keyCode === 38) {
+      this.player.clear(this.ctx, this.cellMultipler)
+      this.player.run = 0
+      this.player.rise = -1
+      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+        this.player.draw(this.ctx, this.cellMultipler)
+      } else {
+        return false
+      }
+    }
+    if (keyCode === 39) {
+      this.player.clear(this.ctx, this.cellMultipler)
+      this.player.run = 1
+      this.player.rise = 0
+      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+        this.player.draw(this.ctx, this.cellMultipler)
+      } else {
+        return false
+      }
+    }
+    if (keyCode === 40) {
+      this.player.clear(this.ctx, this.cellMultipler)
+      this.player.run = 0
+      this.player.rise = 1
+      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+        this.player.draw(this.ctx, this.cellMultipler)
+      } else {
+        return false
+      }
+    }
+    return true
+  }
 }
 
 class Cell {
@@ -221,6 +266,9 @@ class PlayerObj extends GameObj {
     this.cells[0] = cell
     return true
   }
+
+  
+
 }
 
 class ObstacleObj extends GameObj {

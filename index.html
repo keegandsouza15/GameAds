@@ -54,46 +54,8 @@
 
       game.start()
       document.body.onkeydown = function (e) {
-        if (e.keyCode == 37){
-          game.player.clear(ctx, this.cellMultipler)
-          game.player.run = -1
-          game.player.rise = 0
-          if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)){
-            game.player.draw (ctx, this.cellMultipler)
-          } else {
-            game.end()
-          }
-        }
-        if (e.keyCode == 38){
-          game.player.clear(ctx,this.cellMultipler )
-          game.player.run = 0
-          game.player.rise = -1
-          if(game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
-            game.player.draw (ctx, this.cellMultipler)
-          } else {
-            game.end()
-          }
-        }
-        if (e.keyCode == 39){
-          game.player.clear(ctx, this.cellMultipler)
-          game.player.run = 1
-          game.player.rise = 0 
-          if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight)) {
-            game.player.draw (ctx, this.cellMultipler)
-          } else {
-            game.end()
-          }
-        }
-        if (e.keyCode == 40){
-          game.player.clear(ctx, this.cellMultipler)
-          game.player.run = 0
-          game.player.rise = 1
-          if (game.player.updatePos(game.screen, game.screenWidth, game.screenHeight))  {
-            game.player.draw (ctx, this.cellMultipler)
-          } else {
-            game.end()
-          }
-        }
+        if (!game.buttonPressed(e)) alert ('Game Over')
       }
+      
     </script>
 </body>
