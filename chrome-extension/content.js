@@ -18,17 +18,21 @@ helloThere.onclick = function () {
 window.addEventListener('load', init, false)
 
 function init () {
-  console.log('here from init')
   var checkInterval = setInterval(checkForMenuContainer, 500)
-  console.log(document.body.onkeydown)
-  console.log('here from init2')
-
-
   function checkForMenuContainer () {
     let menu = document.getElementById('menu-container')
     if (menu !== null) {
       clearInterval(checkInterval)
       menu.prepend(helloThere)
+      console.log(document.body.onkeydown)
+      console.log('here from init2')
+      document.body.onkeyup = function (e) {
+        // Disables automatic youtube keypress actions
+        let canvas = document.getElementById('gameCanvas')
+        if (canvas !== null) {
+          e.preventDefault()
+        }
+      }
     }
   }
 }
@@ -60,6 +64,7 @@ function drawCanvas () {
   let game = new Game(newCanvas.width, newCanvas.height, ctx, playerScore)
   game.start()
   document.body.onkeydown = function (e) {
+    e.preventDefault()
     if (!game.buttonPressed(e)) {
       game.end()
       clearCanvas()
