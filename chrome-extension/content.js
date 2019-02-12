@@ -1,3 +1,9 @@
+//checkforAdd()
+
+
+
+
+
 var helloThere = document.createElement('button')
 var playerScore = document.createElement('p')
 
@@ -16,6 +22,22 @@ helloThere.onclick = function () {
 //   console.log('here done loading')
 // }
 window.addEventListener('load', init, false)
+window.addEventListener('load', checkforAdd, false)
+
+function checkforAdd () {
+  let checkIntervalAdd = setInterval(checkForAddInterval, 1000)
+  function checkForAddInterval () {
+    console.log('Checking for add')
+    let addButton = document.getElementsByClassName('ytp-ad-button-link')
+    for (let element of addButton) {
+      if (element.textContent !== '' && element.textContent !== 'Stop seeing this ad' && element.textContent !== 'Undo' && element.textContent !== "Visit advertiser's site") {
+        console.log(element.textContent)
+        drawCanvas(element.textContent)
+        clearInterval(checkIntervalAdd)
+      }
+    }
+  }
+}
 
 function init () {
   var checkInterval = setInterval(checkForMenuContainer, 500)
@@ -24,8 +46,6 @@ function init () {
     if (menu !== null) {
       clearInterval(checkInterval)
       menu.prepend(helloThere)
-      console.log(document.body.onkeydown)
-      console.log('here from init2')
       document.body.onkeyup = function (e) {
         // Disables automatic youtube keypress actions
         let canvas = document.getElementById('gameCanvas')
@@ -37,7 +57,7 @@ function init () {
   }
 }
 
-function drawCanvas () {
+function drawCanvas (gameOverLink) {
   // Find the youtube movie player
   var video = document.getElementById('movie_player')
   let vidBound = video.getBoundingClientRect()
@@ -61,7 +81,7 @@ function drawCanvas () {
   ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
   document.body.append(newCanvas)
   // Initizale the game
-  let game = new Game(newCanvas.width, newCanvas.height, ctx, playerScore)
+  let game = new Game(newCanvas.width, newCanvas.height, ctx, playerScore, gameOverLink)
   game.start()
   document.body.onkeydown = function (e) {
     e.preventDefault()
@@ -74,12 +94,14 @@ function drawCanvas () {
   document.body.style.overflow = 'hidden'
 }
 
+
 function clearCanvas () {
   var gameCanvas = document.getElementById('gameCanvas')
   if (!(gameCanvas === null)) document.body.removeChild(gameCanvas)
+
 }
 class Game {
-  constructor (width, height, ctx, scoreElement) {
+  constructor (width, height, ctx, scoreElement, gameOverLink) {
     this.width = width
     this.height = height
     this.screenWidth = 108
@@ -91,6 +113,12 @@ class Game {
     this.updateScreenInterval = NaN
     this.score = 0
     this.scoreElement = scoreElement
+    this.gameOverLink = gameOverLink
+  }
+
+  goToLink (link) {
+    let win = window.open(link)
+    win.focus()
   }
 
   resize (width, height) {
@@ -133,10 +161,11 @@ class Game {
 
   end () {
     clearInterval(this.updateScreenInterval)
-    window.alert('GameOver')
     this.screen.length = 0
     this.objects.length = 0
     this.score = 0
+    playing = false
+    if (this.gameOverLink !== undefined) this.goToLink('https://' + this.gameOverLink)
   }
 
   updateScore () {
@@ -151,6 +180,7 @@ class Game {
       obj.clear(this.ctx, this.cellMultipler, this.screen)
       if (!obj.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
         this.end()
+        clearCanvas()
       }
       obj.draw(this.ctx, this.cellMultipler)
     }
