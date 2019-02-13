@@ -1,23 +1,69 @@
-let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-svg.setAttribute('viewBox', '0 0 24 24')
-svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
-svg.setAttribute('focusable', false)
-svg.setAttribute('class', 'style-scope yt-icon')
-svg.setAttribute('style', 'pointer-events: none; display: block; width: 20px; height: 20px;')
+var playing = false
 
-let g = document.createElement('g')
-g.setAttribute('class', 'style-scope yt-icon')
+function addGameButton () {
+  let topLevelButtons = document.getElementById('top-level-buttons')
+  let youtubeToggleButtonRenderer = topLevelButtons.firstChild
+  // Youtube toogle button renderer
+  let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
+  youtubeToggleButtonRendererClone.onClick = function (e) { e.preventDefault() }
+  topLevelButtons.insertBefore(youtubeToggleButtonRendererClone, topLevelButtons.childNodes[2])
+  // a class = 'yt-simple-endpoint'
+  let aYtSimpleEndpoint = youtubeToggleButtonRenderer.firstChild
+  let aYtSimpleEndpointClone = aYtSimpleEndpoint.cloneNode(false)
+  youtubeToggleButtonRendererClone.append(aYtSimpleEndpointClone)
+  // Youtube icon button
+  let ytIconButton = aYtSimpleEndpoint.firstChild
+  let ytIconButtonClone = ytIconButton.cloneNode(false)
+  ytIconButtonClone.innerHTML = ''
+  aYtSimpleEndpointClone.append(ytIconButtonClone)
+  // Button
+  let button = document.createElement('button')
+  button.onclick = gameButtonClick
+  button.setAttribute('class', 'style-scope yt-icon-button')
+  button.setAttribute('id', 'button')
+  button.setAttribute('aria-label', 'Play game')
+  ytIconButtonClone.append(button)
+  // YT-icon
+  let youtubeIcon = document.createElement('yt-icon')
 
-let path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-path.setAttribute('d', 'M23 6H1v12h22V6zm-12 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z')
-//path.setAttribute('class', 'style-scope yt-icon')
-//g.append(path)
-svg.append(path)
+  youtubeIcon.setAttribute('class', 'style-scope ytd-toggle-button-renderer')
+  button.append(youtubeIcon)
+  // SVG
+  let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('id', 'game-icon-svg')
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+  svg.setAttribute('focusable', false)
+  svg.setAttribute('class', 'style-scope yt-icon')
+  svg.setAttribute('style', 'pointer-events: none; display: block; width: 100%; height: 100%;')
+  youtubeIcon.append(svg)
+  // G
+  let g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+  g.setAttribute('class', 'style-scope yt-icon')
+  svg.append(g)
+  // Path
+  let path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  path.setAttribute('d', 'M23 6H1v12h22V6zm-12 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z')
+  path.setAttribute('class', 'style-scope yt-icon')
+  g.append(path)
+}
+
+function gameButtonClick () {
+  playing = !playing;
+  (playing) ? drawCanvas() : clearCanvas()
+}
 
 // Creates the score display element
 var playerScore = document.createElement('p')
-playerScore.setAttribute('class', 'style-scope ytd-toggle-button-renderer style-text')
-playerScore.innerHTML = 100
+playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center')
+playerScore.setAttribute('id', 'game-score')
+playerScore.style.display = 'none'
+// playerScore.setAttribute('hidden', false)
+playerScore.style.position = 'absolute'
+playerScore.style.top = 720 + 'px'
+playerScore.style.left = 700 + 'px'
+playerScore.innerHTML = 0
+document.body.append(playerScore)
 
 // Initizales the toggle buttons to youtube onload
 function init () {
@@ -27,74 +73,20 @@ function init () {
     console.log('Checking...')
     let menu = document.getElementById('menu-container')
     if (menu !== null) {
-      let toplevelbuttons = document.getElementById('top-level-buttons')
-      toplevelbuttons.append(svg)
-     
-      let youtubeToggleButtonRenderer = document.getElementById('top-level-buttons').firstChild
-      let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(true)
-      let youtubeSimpleEndpoint = document.getElementsByClassName('yt-simple-endpoint')
-      let a = youtubeToggleButtonRenderer.firstChild
-      let aClone = a.cloneNode(true)
-      aClone.firstChild.innerHTML = ''
-      let ytIconButton = aClone.firstChild
-      // Button
-      let button = document.createElement('button')
-      button.setAttribute('class', 'style-scope yt-icon-button')
-      button.setAttribute('id', 'button')
-      button.setAttribute('aria-label', 'this is a test')
-      // YT-icon
-      let youtubeIcon = document.createElement('yt-icon')
-      youtubeIcon.setAttribute('class', 'style-scope ytd-toggle-button-renderer')
-      youtubeIcon.append(svg)
-      button.append(youtubeIcon)
-      ytIconButton.append(button)
-
-
-      console.log(ytIconButton)
+      addGameButton()
+      document.body.append(playerScore)
       clearInterval(checkInterval)
-      //menu.prepend(playerScore)
-      youtubeToggleButtonRendererClone.append(aClone)
-      document.getElementById('top-level-buttons').prepend(youtubeToggleButtonRendererClone)
     }
   }
 }
-
-
-
-
-
-
-// toggleGameButton.innerHTML = 'Hello There from extension'
-// var playing = false
-// toggleGameButton.onclick = function () {
-//   (playing === true) ? clearCanvas() : drawCanvas()
-//   playing = !playing
-// }
 
 window.addEventListener('load', init, false)
-//window.addEventListener('load', checkforAdd, false)
-
-var checkIntervalAdd = null
 var myGame = null
-
-function checkforAdd () {
-  checkIntervalAdd = setInterval(checkForAddInterval, 1000)
-  function checkForAddInterval () {
-    console.log('Checking for add')
-    let addButton = document.getElementById('action-companion-click-target')
-    console.log(addButton)
-    if (addButton !== null && addButton.href !== '') {
-      console.log(addButton.href)
-      drawCanvas(addButton.href)
-      clearInterval(checkIntervalAdd)
-    }
-  }
-}
-
-
-function drawCanvas (gameOverLink) {
-  // clears the add listeners
-  clearInterval(checkIntervalAdd)
+function drawCanvas () {
+  // playerScore.setAttribute('hidden', false)
+  playerScore.style.display = 'inline'
+  // Changes button color
+  document.getElementById('game-icon-svg').setAttribute('fill', '#ff0000')
   // Find the youtube movie player
   var video = document.getElementById('movie_player')
   let vidBound = video.getBoundingClientRect()
@@ -111,14 +103,14 @@ function drawCanvas (gameOverLink) {
   } else {
     newCanvas.style.top = vidBound.top + 'px'
   }
-  newCanvas.style.left = vidBound.left + 'px'
+  newCanvas.style.left = vidBound.left + 6 + 'px'
   newCanvas.style.position = 'absolute'
   let ctx = newCanvas.getContext('2d')
   ctx.fillStyle = 'black'
   ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
   document.body.append(newCanvas)
   // Initizale the game
-  myGame = new Game(newCanvas.width, newCanvas.height, ctx, playerScore, gameOverLink)
+  myGame = new Game(newCanvas.width, newCanvas.height, ctx, playerScore)
   myGame.start()
   document.body.onkeydown = function (e) {
     e.preventDefault()
@@ -132,16 +124,19 @@ function drawCanvas (gameOverLink) {
 }
 
 function clearCanvas () {
+  playerScore.style.display = 'none'
+  // Changes button color
+  document.getElementById('game-icon-svg').setAttribute('fill', 'hsl(0, 0%, 53.3%)')
+
   var gameCanvas = document.getElementById('gameCanvas')
   if (!(gameCanvas === null)) document.body.removeChild(gameCanvas)
   // Set the content back to scroll
   document.body.style.overflow = 'scroll'
-  checkforAdd()
   myGame.end()
 }
 
 class Game {
-  constructor (width, height, ctx, scoreElement, gameOverLink) {
+  constructor (width, height, ctx, scoreElement) {
     this.width = width
     this.height = height
     this.screenWidth = 108
@@ -153,13 +148,6 @@ class Game {
     this.updateScreenInterval = NaN
     this.score = 0
     this.scoreElement = scoreElement
-    this.gameOverLink = gameOverLink
-  }
-
-  goToLink (link) {
-    console.log(link)
-    let win = window.open(link)
-    win.focus()
   }
 
   resize (width, height) {
@@ -168,7 +156,6 @@ class Game {
     this.cellMultipler = this.width / this.screenWidth
     this.screenHeight = parseInt(this.height / this.cellMultipler)
     this.reset()
-    console.log(this.width, this.height, this.screenHeight)
   }
 
   start () {
@@ -184,7 +171,7 @@ class Game {
     // Add the player
     this.player = new PlayerObj(50, 12, this.objects.length)
     this.objects.push(this.player)
-    this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 60)
+    this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 10)
     // Adds a test obstacle
     let obstancle = new ObstacleObj(10, 10, -1, -1, 4, this.objects.length)
     this.objects.push(obstancle)
@@ -205,7 +192,6 @@ class Game {
     this.screen.length = 0
     this.objects.length = 0
     this.score = 0
-    if (this.gameOverLink !== undefined) this.goToLink(this.gameOverLink)
   }
 
   updateScore () {
@@ -246,7 +232,6 @@ class Game {
       }
     }
     if (keyCode === 38) {
-      console.log(keyCode)
       this.player.clear(this.ctx, this.cellMultipler)
       this.player.run = 0
       this.player.rise = -1
