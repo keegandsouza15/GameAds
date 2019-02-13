@@ -55,7 +55,7 @@ function gameButtonClick () {
 
 // Creates the score display element
 var playerScore = document.createElement('p')
-playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center')
+playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:2px; border-color:#ff0000')
 playerScore.setAttribute('id', 'game-score')
 playerScore.style.display = 'none'
 // playerScore.setAttribute('hidden', false)
@@ -124,7 +124,20 @@ function drawCanvas () {
 }
 
 function clearCanvas () {
-  playerScore.style.display = 'none'
+  playerScore.style.background = 'white'
+  var id = setInterval(frame, 5)
+  var pos = parseInt(playerScore.style.top)
+  console.log(pos)
+  function frame () {
+    if (pos <= 350) {
+      clearInterval(id)
+      playerScore.style.display = 'none'
+      playerScore.style.top = 720 + 'px'
+    } else {
+      pos = pos - 3
+      playerScore.style.top = pos + 'px'
+    }
+  }
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', 'hsl(0, 0%, 53.3%)')
 
@@ -171,24 +184,22 @@ class Game {
     // Add the player
     this.player = new PlayerObj(50, 12, this.objects.length)
     this.objects.push(this.player)
-    this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 10)
-    // Adds a test obstacle
-    let obstancle = new ObstacleObj(10, 10, -1, -1, 4, this.objects.length)
-    this.objects.push(obstancle)
-    obstancle = new ObstacleObj(1, 1, -1, -1, 4, this.objects.length)
-    this.objects.push(obstancle)
+    this.updateScreenInterval = setInterval(this.updateScreen.bind(this), 50)
+    // Adds a test obstacles every 2 seconds
+    this.addObstanceInterval = setInterval(this.createObstancle.bind(this), 2000)
   }
 
-  reset () {
-    this.screen.length = 0
-    this.objects.length = 0
-    this.score = 0
-    clearInterval(this.updateScreenInterval)
-    this.start()
+  createObstancle () {
+    let obstacle = null
+    var posorNeg = Math.floor((Math.random() * 70) + 1)
+    console.log(posorNeg)
+    obstacle = new ObstacleObj(posorNeg, posorNeg, -1, -1, 4, this.objects.length)
+    this.objects.push(obstacle)
   }
 
   end () {
     clearInterval(this.updateScreenInterval)
+    clearInterval(this.addObstanceInterval)
     this.screen.length = 0
     this.objects.length = 0
     this.score = 0
@@ -199,7 +210,6 @@ class Game {
   }
 
   updateScreen () {
-    console.log('Im updating the screen')
     this.redrawBackGround()
     this.updateScore()
     this.score += 1
