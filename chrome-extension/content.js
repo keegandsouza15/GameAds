@@ -1,63 +1,100 @@
-//checkforAdd()
+let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+svg.setAttribute('viewBox', '0 0 24 24')
+svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+svg.setAttribute('focusable', false)
+svg.setAttribute('class', 'style-scope yt-icon')
+svg.setAttribute('style', 'pointer-events: none; display: block; width: 20px; height: 20px;')
 
+let g = document.createElement('g')
+g.setAttribute('class', 'style-scope yt-icon')
 
+let path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+path.setAttribute('d', 'M23 6H1v12h22V6zm-12 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z')
+//path.setAttribute('class', 'style-scope yt-icon')
+//g.append(path)
+svg.append(path)
 
-
-
-var helloThere = document.createElement('button')
+// Creates the score display element
 var playerScore = document.createElement('p')
+playerScore.setAttribute('class', 'style-scope ytd-toggle-button-renderer style-text')
+playerScore.innerHTML = 100
 
-
-
-helloThere.innerHTML = 'Hello There from extension'
-var playing = false
-helloThere.onclick = function () {
-  (playing === true) ? clearCanvas() : drawCanvas()
-  playing = !playing
-}
-
-// if (document.readyState === 'loading') {
-//   console.log('loading')
-// } else {
-//   console.log('here done loading')
-// }
-window.addEventListener('load', init, false)
-window.addEventListener('load', checkforAdd, false)
-
-function checkforAdd () {
-  let checkIntervalAdd = setInterval(checkForAddInterval, 1000)
-  function checkForAddInterval () {
-    console.log('Checking for add')
-    let addButton = document.getElementsByClassName('ytp-ad-button-link')
-    for (let element of addButton) {
-      if (element.textContent !== '' && element.textContent !== 'Stop seeing this ad' && element.textContent !== 'Undo' && element.textContent !== "Visit advertiser's site") {
-        console.log(element.textContent)
-        drawCanvas(element.textContent)
-        clearInterval(checkIntervalAdd)
-      }
-    }
-  }
-}
-
+// Initizales the toggle buttons to youtube onload
 function init () {
   var checkInterval = setInterval(checkForMenuContainer, 500)
+  // Waits for the youtube menu to load
   function checkForMenuContainer () {
+    console.log('Checking...')
     let menu = document.getElementById('menu-container')
     if (menu !== null) {
+      let toplevelbuttons = document.getElementById('top-level-buttons')
+      toplevelbuttons.append(svg)
+     
+      let youtubeToggleButtonRenderer = document.getElementById('top-level-buttons').firstChild
+      let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(true)
+      let youtubeSimpleEndpoint = document.getElementsByClassName('yt-simple-endpoint')
+      let a = youtubeToggleButtonRenderer.firstChild
+      let aClone = a.cloneNode(true)
+      aClone.firstChild.innerHTML = ''
+      let ytIconButton = aClone.firstChild
+      // Button
+      let button = document.createElement('button')
+      button.setAttribute('class', 'style-scope yt-icon-button')
+      button.setAttribute('id', 'button')
+      button.setAttribute('aria-label', 'this is a test')
+      // YT-icon
+      let youtubeIcon = document.createElement('yt-icon')
+      youtubeIcon.setAttribute('class', 'style-scope ytd-toggle-button-renderer')
+      youtubeIcon.append(svg)
+      button.append(youtubeIcon)
+      ytIconButton.append(button)
+
+
+      console.log(ytIconButton)
       clearInterval(checkInterval)
-      menu.prepend(helloThere)
-      document.body.onkeyup = function (e) {
-        // Disables automatic youtube keypress actions
-        let canvas = document.getElementById('gameCanvas')
-        if (canvas !== null) {
-          e.preventDefault()
-        }
-      }
+      //menu.prepend(playerScore)
+      youtubeToggleButtonRendererClone.append(aClone)
+      document.getElementById('top-level-buttons').prepend(youtubeToggleButtonRendererClone)
     }
   }
 }
 
+
+
+
+
+
+// toggleGameButton.innerHTML = 'Hello There from extension'
+// var playing = false
+// toggleGameButton.onclick = function () {
+//   (playing === true) ? clearCanvas() : drawCanvas()
+//   playing = !playing
+// }
+
+window.addEventListener('load', init, false)
+//window.addEventListener('load', checkforAdd, false)
+
+var checkIntervalAdd = null
+var myGame = null
+
+function checkforAdd () {
+  checkIntervalAdd = setInterval(checkForAddInterval, 1000)
+  function checkForAddInterval () {
+    console.log('Checking for add')
+    let addButton = document.getElementById('action-companion-click-target')
+    console.log(addButton)
+    if (addButton !== null && addButton.href !== '') {
+      console.log(addButton.href)
+      drawCanvas(addButton.href)
+      clearInterval(checkIntervalAdd)
+    }
+  }
+}
+
+
 function drawCanvas (gameOverLink) {
+  // clears the add listeners
+  clearInterval(checkIntervalAdd)
   // Find the youtube movie player
   var video = document.getElementById('movie_player')
   let vidBound = video.getBoundingClientRect()
@@ -81,12 +118,12 @@ function drawCanvas (gameOverLink) {
   ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
   document.body.append(newCanvas)
   // Initizale the game
-  let game = new Game(newCanvas.width, newCanvas.height, ctx, playerScore, gameOverLink)
-  game.start()
+  myGame = new Game(newCanvas.width, newCanvas.height, ctx, playerScore, gameOverLink)
+  myGame.start()
   document.body.onkeydown = function (e) {
     e.preventDefault()
-    if (!game.buttonPressed(e)) {
-      game.end()
+    if (!myGame.buttonPressed(e)) {
+      myGame.end()
       clearCanvas()
     }
   }
@@ -94,12 +131,15 @@ function drawCanvas (gameOverLink) {
   document.body.style.overflow = 'hidden'
 }
 
-
 function clearCanvas () {
   var gameCanvas = document.getElementById('gameCanvas')
   if (!(gameCanvas === null)) document.body.removeChild(gameCanvas)
-
+  // Set the content back to scroll
+  document.body.style.overflow = 'scroll'
+  checkforAdd()
+  myGame.end()
 }
+
 class Game {
   constructor (width, height, ctx, scoreElement, gameOverLink) {
     this.width = width
@@ -117,6 +157,7 @@ class Game {
   }
 
   goToLink (link) {
+    console.log(link)
     let win = window.open(link)
     win.focus()
   }
@@ -164,8 +205,7 @@ class Game {
     this.screen.length = 0
     this.objects.length = 0
     this.score = 0
-    playing = false
-    if (this.gameOverLink !== undefined) this.goToLink('https://' + this.gameOverLink)
+    if (this.gameOverLink !== undefined) this.goToLink(this.gameOverLink)
   }
 
   updateScore () {
@@ -173,6 +213,7 @@ class Game {
   }
 
   updateScreen () {
+    console.log('Im updating the screen')
     this.redrawBackGround()
     this.updateScore()
     this.score += 1
