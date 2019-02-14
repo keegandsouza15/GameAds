@@ -60,7 +60,7 @@ playerScore.setAttribute('id', 'game-score')
 playerScore.style.display = 'none'
 // playerScore.setAttribute('hidden', false)
 playerScore.style.position = 'absolute'
-playerScore.style.top = 720 + 'px'
+playerScore.style.top = 800 + 'px'
 playerScore.style.left = 700 + 'px'
 playerScore.innerHTML = 0
 document.body.append(playerScore)
@@ -132,7 +132,7 @@ function clearCanvas () {
     if (pos <= 350) {
       clearInterval(id)
       playerScore.style.display = 'none'
-      playerScore.style.top = 720 + 'px'
+      playerScore.style.top = 800 + 'px'
     } else {
       pos = pos - 3
       playerScore.style.top = pos + 'px'
@@ -190,10 +190,19 @@ class Game {
   }
 
   createObstancle () {
+    // Generates random values for the starting location.
     let obstacle = null
-    var posorNeg = Math.floor((Math.random() * 70) + 1)
-    console.log(posorNeg)
-    obstacle = new ObstacleObj(posorNeg, posorNeg, -1, -1, 4, this.objects.length)
+    let size = Math.floor(Math.random() * 9) + 1
+    let startinglocation = Math.floor(Math.random() * 4) + 1
+    if (startinglocation === 1) {
+      obstacle = new ObstacleObj(0 + size, 0 + size, -1, 1, size, this.objects.length)
+    } else if (startinglocation === 2) {
+      obstacle = new ObstacleObj(0 + size, this.screenHeight - size, -1, 1, size, this.objects.length)
+    } else if (startinglocation === 3) {
+      obstacle = new ObstacleObj(this.screenWidth - size, 0 + size, 1, -1, size, this.objects.length)
+    } else if (startinglocation === 4) {
+      obstacle = new ObstacleObj(this.screenWidth - size, this.screenHeight - size, -1, -1, size, this.objects.length)
+    }
     this.objects.push(obstacle)
   }
 
@@ -210,7 +219,6 @@ class Game {
   }
 
   updateScreen () {
-    this.redrawBackGround()
     this.updateScore()
     this.score += 1
     for (let obj of this.objects) {
@@ -329,15 +337,16 @@ class GameObj {
   clear (ctx, cellMultipler) {
     // ReFill the circle
     let radius = cellMultipler / 2
-    ctx.fillStyle = 'pink'
-    ctx.globalAlpha = 0.2
     ctx.globalCompositeOperation = 'source-over'
+    ctx.fillStyle = 'black'
     for (let cell of this.cells) {
       let x = cell.row * cellMultipler
       let y = cell.column * cellMultipler
       ctx.beginPath()
-      ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
-      ctx.fill()
+      ctx.arc(x + radius, y + radius, radius + 1, 0, 2 * Math.PI, false)
+      for (let i = 0; i < 4; i++) {
+        ctx.fill()
+      }
     }
   }
 
@@ -398,6 +407,20 @@ class PlayerObj extends GameObj {
     }
   }
 
+  clear (ctx, cellMultipler) {
+    let radius = cellMultipler / 2
+    let x = (this.cells[0].row) * cellMultipler
+    let y = (this.cells[0].column) * cellMultipler
+    // ReFill the circle
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.fillStyle = 'black'
+    ctx.beginPath()
+    ctx.arc(x + radius, y + radius, radius + 1, 0, 2 * Math.PI, false)
+    for (let i = 0; i < 4; i++) {
+      ctx.fill()
+    }
+  }
+
   updatePos (screen, screenWidth, screenHeight) {
     let cell = this.cells[0]
     // Resets the screen
@@ -420,7 +443,6 @@ class PlayerObj extends GameObj {
 
 class ObstacleObj extends GameObj {
   constructor (centerX, centerY, rise, run, size, index) {
-    size = 4
     let cellIndex = index
     let square = parseInt(Math.sqrt(size))
     let cells = []
