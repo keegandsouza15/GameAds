@@ -125,17 +125,21 @@ function drawCanvas () {
 
 function clearCanvas () {
   playerScore.style.background = 'white'
-  var id = setInterval(frame, 5)
+  var id = setInterval(frame, 2)
   var pos = parseInt(playerScore.style.top)
-  console.log(pos)
+  let delayInterval = null
   function frame () {
     if (pos <= 350) {
       clearInterval(id)
+      delayInterval = setInterval(delay, 1000)
+    } else {
+      pos = pos - 2
+      playerScore.style.top = pos + 'px'
+    }
+    function delay () {
+      clearInterval(delayInterval)
       playerScore.style.display = 'none'
       playerScore.style.top = 800 + 'px'
-    } else {
-      pos = pos - 3
-      playerScore.style.top = pos + 'px'
     }
   }
   // Changes button color
