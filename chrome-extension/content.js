@@ -1,4 +1,6 @@
 var playing = false
+window.addEventListener('load', init, false)
+var myGame = null
 
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
@@ -80,8 +82,6 @@ function init () {
   }
 }
 
-window.addEventListener('load', init, false)
-var myGame = null
 function drawCanvas () {
   // playerScore.setAttribute('hidden', false)
   playerScore.style.display = 'inline'
@@ -216,6 +216,7 @@ class Game {
     this.screen.length = 0
     this.objects.length = 0
     this.score = 0
+    playing = false
   }
 
   updateScore () {
