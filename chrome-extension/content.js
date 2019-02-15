@@ -83,7 +83,8 @@ function init () {
 }
 
 function drawCanvas () {
-  // playerScore.setAttribute('hidden', false)
+  // Scroll to the top and display the player score
+  document.documentElement.scrollTop = 0
   playerScore.style.display = 'inline'
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', '#ff0000')
@@ -213,8 +214,8 @@ class Game {
   end () {
     clearInterval(this.updateScreenInterval)
     clearInterval(this.addObstanceInterval)
-    this.screen.length = 0
     this.objects.length = 0
+    this.screen.length = 0
     this.score = 0
     playing = false
   }
