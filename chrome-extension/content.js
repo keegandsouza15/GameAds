@@ -1,6 +1,6 @@
 var playing = false
-window.addEventListener('load', init, false)
 var myGame = null
+window.addEventListener('load', init, false)
 
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
@@ -27,7 +27,6 @@ function addGameButton () {
   ytIconButtonClone.append(button)
   // YT-icon
   let youtubeIcon = document.createElement('yt-icon')
-
   youtubeIcon.setAttribute('class', 'style-scope ytd-toggle-button-renderer')
   button.append(youtubeIcon)
   // SVG
@@ -116,7 +115,6 @@ function drawCanvas () {
   document.body.onkeydown = function (e) {
     e.preventDefault()
     if (!myGame.buttonPressed(e)) {
-      myGame.end()
       clearCanvas()
     }
   }
@@ -163,17 +161,8 @@ class Game {
     this.screen = []
     this.objects = []
     this.ctx = ctx
-    this.updateScreenInterval = NaN
     this.score = 0
     this.scoreElement = scoreElement
-  }
-
-  resize (width, height) {
-    this.width = width
-    this.height = height
-    this.cellMultipler = this.width / this.screenWidth
-    this.screenHeight = parseInt(this.height / this.cellMultipler)
-    this.reset()
   }
 
   start () {
@@ -185,7 +174,9 @@ class Game {
       this.screen.push(row)
     }
     // Add the black background
-    this.redrawBackGround()
+    this.ctx.globalCompositeOperation = 'source-over'
+    this.ctx.fillStyle = 'black'
+    this.ctx.fillRect(0, 0, this.width, this.height)
     // Add the player
     this.player = new PlayerObj(50, 12, this.objects.length)
     this.objects.push(this.player)
@@ -220,12 +211,8 @@ class Game {
     playing = false
   }
 
-  updateScore () {
-    this.scoreElement.innerHTML = this.score
-  }
-
   updateScreen () {
-    this.updateScore()
+    this.scoreElement.innerHTML = this.score
     this.score += 1
     for (let obj of this.objects) {
       obj.clear(this.ctx, this.cellMultipler, this.screen)
@@ -237,55 +224,32 @@ class Game {
     }
   }
 
-  redrawBackGround () {
-    this.ctx.globalCompositeOperation = 'source-over'
-    this.ctx.fillStyle = 'black'
-    this.ctx.fillRect(0, 0, this.width, this.height)
-  }
-
   buttonPressed (e) {
     let keyCode = e.keyCode
-    if (keyCode === 37) {
-      this.player.clear(this.ctx, this.cellMultipler)
-      this.player.run = -1
-      this.player.rise = 0
-      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.player.draw(this.ctx, this.cellMultipler)
-      } else {
-        return false
-      }
+    switch (keyCode) {
+      case 37:
+        this.player.run = -1
+        this.player.rise = 0
+        break
+      case 38:
+        this.player.run = 0
+        this.player.rise = -1
+        break
+      case 39:
+        this.player.run = 1
+        this.player.rise = 0
+        break
+      case 40:
+        this.player.run = 0
+        this.player.rise = 1
+        break
     }
-    if (keyCode === 38) {
-      this.player.clear(this.ctx, this.cellMultipler)
-      this.player.run = 0
-      this.player.rise = -1
-      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.player.draw(this.ctx, this.cellMultipler)
-      } else {
-        return false
-      }
+    this.player.clear(this.ctx, this.cellMultipler)
+    if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
+      this.player.draw(this.ctx, this.cellMultipler)
+      return true
     }
-    if (keyCode === 39) {
-      this.player.clear(this.ctx, this.cellMultipler)
-      this.player.run = 1
-      this.player.rise = 0
-      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.player.draw(this.ctx, this.cellMultipler)
-      } else {
-        return false
-      }
-    }
-    if (keyCode === 40) {
-      this.player.clear(this.ctx, this.cellMultipler)
-      this.player.run = 0
-      this.player.rise = 1
-      if (this.player.updatePos(this.screen, this.screenWidth, this.screenHeight)) {
-        this.player.draw(this.ctx, this.cellMultipler)
-      } else {
-        return false
-      }
-    }
-    return true
+    return false
   }
 }
 
@@ -401,31 +365,29 @@ class PlayerObj extends GameObj {
   draw (ctx, cellMultipler) {
     let radius = cellMultipler / 2
     ctx.fillStyle = '#FF2332'
-    for (let cell of this.cells) {
-      let x = (cell.row) * cellMultipler
-      let y = (cell.column) * cellMultipler
-      ctx.globalCompositeOperation = 'source-over'
-      ctx.globalAlpha = 0.8
-      ctx.beginPath()
-      ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
-      ctx.fillStyle = 'red'
-      ctx.fill()
-    }
-  }
-
-  clear (ctx, cellMultipler) {
-    let radius = cellMultipler / 2
     let x = (this.cells[0].row) * cellMultipler
     let y = (this.cells[0].column) * cellMultipler
-    // ReFill the circle
     ctx.globalCompositeOperation = 'source-over'
-    ctx.fillStyle = 'black'
+    ctx.globalAlpha = 0.8
     ctx.beginPath()
-    ctx.arc(x + radius, y + radius, radius + 1, 0, 2 * Math.PI, false)
-    for (let i = 0; i < 4; i++) {
-      ctx.fill()
-    }
+    ctx.arc(x + radius, y + radius, radius, 0, 2 * Math.PI, false)
+    ctx.fillStyle = 'red'
+    ctx.fill()
   }
+
+  // clear (ctx, cellMultipler) {
+  //   let radius = cellMultipler / 2
+  //   let x = (this.cells[0].row) * cellMultipler
+  //   let y = (this.cells[0].column) * cellMultipler
+  //   // ReFill the circle
+  //   ctx.globalCompositeOperation = 'source-over'
+  //   ctx.fillStyle = 'black'
+  //   ctx.beginPath()
+  //   ctx.arc(x + radius, y + radius, radius + 1, 0, 2 * Math.PI, false)
+  //   for (let i = 0; i < 4; i++) {
+  //     ctx.fill()
+  //   }
+  // }
 
   updatePos (screen, screenWidth, screenHeight) {
     let cell = this.cells[0]
