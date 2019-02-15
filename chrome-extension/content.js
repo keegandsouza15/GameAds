@@ -11,16 +11,17 @@ function insertGameButton () {
   }
 }
 
+function test () {
+  console.log('test')
+}
+
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
   youtubeToggleButtonRendererClone.id = 'gameToggleButton'
-  youtubeToggleButtonRendererClone.onClick = function (e) {
-    console.log('here')
-    e.preventDefault()
-  }
+  youtubeToggleButtonRendererClone.onclick = gameButtonClick
   topLevelButtons.insertBefore(youtubeToggleButtonRendererClone, topLevelButtons.childNodes[2])
   // a class = 'yt-simple-endpoint'
   let aYtSimpleEndpoint = youtubeToggleButtonRenderer.firstChild
@@ -33,7 +34,6 @@ function addGameButton () {
   aYtSimpleEndpointClone.append(ytIconButtonClone)
   // Button
   let button = document.createElement('button')
-  button.onclick = gameButtonClick
   button.setAttribute('class', 'style-scope yt-icon-button')
   button.setAttribute('id', 'button')
   button.setAttribute('aria-label', 'Play game')
