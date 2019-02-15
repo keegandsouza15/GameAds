@@ -1,12 +1,21 @@
+console.log('Script is being called')
+console.log('shit')
+var myGame = false
 var playing = false
-var myGame = null
-window.addEventListener('load', init, false)
-
+setInterval(check, 1000)
+function check () {
+  let topLevelButtons = document.getElementById('top-level-buttons')
+  if (topLevelButtons.childNodes.length !== 0 && topLevelButtons.childNodes[2].id !== 'gameToggleButton') {
+    addGameButton()
+    document.body.append(playerScore)
+  }
+}
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
+  youtubeToggleButtonRendererClone.id = 'gameToggleButton'
   youtubeToggleButtonRendererClone.onClick = function (e) { e.preventDefault() }
   topLevelButtons.insertBefore(youtubeToggleButtonRendererClone, topLevelButtons.childNodes[2])
   // a class = 'yt-simple-endpoint'
@@ -48,7 +57,6 @@ function addGameButton () {
   path.setAttribute('class', 'style-scope yt-icon')
   g.append(path)
 }
-
 function gameButtonClick () {
   playing = !playing;
   (playing) ? drawCanvas() : clearCanvas()
@@ -59,24 +67,22 @@ var playerScore = document.createElement('p')
 playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:2px; border-color:#ff0000')
 playerScore.setAttribute('id', 'game-score')
 playerScore.style.display = 'none'
-// playerScore.setAttribute('hidden', false)
 playerScore.style.position = 'absolute'
 playerScore.style.top = 800 + 'px'
 playerScore.style.left = 700 + 'px'
 playerScore.innerHTML = 0
 document.body.append(playerScore)
 
-// Initizales the toggle buttons to youtube onload
-function init () {
-  var checkInterval = setInterval(checkForMenuContainer, 500)
-  // Waits for the youtube menu to load
-  function checkForMenuContainer () {
-    console.log('Checking...')
-    let menu = document.getElementById('menu-container')
+function checkForMenuContainer () {
+  let checkInterval = setInterval(check, 500)
+  function check () {
+    let me = document.getElementById('top-level-buttons')
+    let menu = me.firstChild
+    console.log(menu)
     if (menu !== null) {
+      clearInterval(checkInterval)
       addGameButton()
       document.body.append(playerScore)
-      clearInterval(checkInterval)
     }
   }
 }
@@ -374,20 +380,6 @@ class PlayerObj extends GameObj {
     ctx.fillStyle = 'red'
     ctx.fill()
   }
-
-  // clear (ctx, cellMultipler) {
-  //   let radius = cellMultipler / 2
-  //   let x = (this.cells[0].row) * cellMultipler
-  //   let y = (this.cells[0].column) * cellMultipler
-  //   // ReFill the circle
-  //   ctx.globalCompositeOperation = 'source-over'
-  //   ctx.fillStyle = 'black'
-  //   ctx.beginPath()
-  //   ctx.arc(x + radius, y + radius, radius + 1, 0, 2 * Math.PI, false)
-  //   for (let i = 0; i < 4; i++) {
-  //     ctx.fill()
-  //   }
-  // }
 
   updatePos (screen, screenWidth, screenHeight) {
     let cell = this.cells[0]

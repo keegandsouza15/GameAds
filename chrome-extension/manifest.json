@@ -8,6 +8,8 @@
         "*://www.youtube.com/*",
         "*://youtube.com/*"
       ],
+      "run_at": "document_end",
+
       "js" : ["content.js"]
     }
   ]
