@@ -1,15 +1,16 @@
-console.log('Script is being called')
-console.log('shit')
 var myGame = false
 var playing = false
-setInterval(check, 1000)
-function check () {
+
+setInterval(insertGameButton, 1000)
+function insertGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
-  if (topLevelButtons.childNodes.length !== 0 && topLevelButtons.childNodes[2].id !== 'gameToggleButton') {
+  let nodes = topLevelButtons.childNodes
+  if (nodes.length !== 0 && nodes[2].id !== 'gameToggleButton') {
     addGameButton()
     document.body.append(playerScore)
   }
 }
+
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
@@ -73,23 +74,11 @@ playerScore.style.left = 700 + 'px'
 playerScore.innerHTML = 0
 document.body.append(playerScore)
 
-function checkForMenuContainer () {
-  let checkInterval = setInterval(check, 500)
-  function check () {
-    let me = document.getElementById('top-level-buttons')
-    let menu = me.firstChild
-    console.log(menu)
-    if (menu !== null) {
-      clearInterval(checkInterval)
-      addGameButton()
-      document.body.append(playerScore)
-    }
-  }
-}
-
 function drawCanvas () {
   // Scroll to the top and display the player score
   document.documentElement.scrollTop = 0
+  playerScore.style.top = 800 + 'px'
+  playerScore.style.left = 700 + 'px'
   playerScore.style.display = 'inline'
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', '#ff0000')
@@ -128,12 +117,17 @@ function drawCanvas () {
   document.body.style.overflow = 'hidden'
 }
 
-function clearCanvas () {
+function animateScore () {
   playerScore.style.background = 'white'
   var id = setInterval(frame, 2)
   var pos = parseInt(playerScore.style.top)
   let delayInterval = null
   function frame () {
+    if (playing) {
+      clearInterval(id)
+      delayInterval = setInterval(delay, 1)
+
+    }
     if (pos <= 350) {
       clearInterval(id)
       delayInterval = setInterval(delay, 1000)
@@ -143,10 +137,14 @@ function clearCanvas () {
     }
     function delay () {
       clearInterval(delayInterval)
-      playerScore.style.display = 'none'
       playerScore.style.top = 800 + 'px'
     }
   }
+}
+
+function clearCanvas () {
+  animateScore()
+
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', 'hsl(0, 0%, 53.3%)')
 
@@ -384,7 +382,11 @@ class PlayerObj extends GameObj {
   updatePos (screen, screenWidth, screenHeight) {
     let cell = this.cells[0]
     // Resets the screen
-    screen[cell.row][cell.column] = new Cell(cell.row, cell.col, -1)
+    try {
+      screen[cell.row][cell.column] = new Cell(cell.row, cell.col, -1)
+    } catch (Expection) {
+      return false
+    }
     // Adds the rise and the run
     cell.row += this.run
     cell.column += this.rise
