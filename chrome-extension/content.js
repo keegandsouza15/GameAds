@@ -17,7 +17,10 @@ function addGameButton () {
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
   youtubeToggleButtonRendererClone.id = 'gameToggleButton'
-  youtubeToggleButtonRendererClone.onClick = function (e) { e.preventDefault() }
+  youtubeToggleButtonRendererClone.onClick = function (e) {
+    console.log('here')
+    e.preventDefault()
+  }
   topLevelButtons.insertBefore(youtubeToggleButtonRendererClone, topLevelButtons.childNodes[2])
   // a class = 'yt-simple-endpoint'
   let aYtSimpleEndpoint = youtubeToggleButtonRenderer.firstChild
@@ -125,8 +128,8 @@ function animateScore () {
   function frame () {
     if (playing) {
       clearInterval(id)
-      delayInterval = setInterval(delay, 1)
-
+      playerScore.style.display = 'inline'
+      return
     }
     if (pos <= 350) {
       clearInterval(id)
@@ -138,11 +141,14 @@ function animateScore () {
     function delay () {
       clearInterval(delayInterval)
       playerScore.style.top = 800 + 'px'
+      playerScore.style.display = 'none'
+
     }
   }
 }
 
 function clearCanvas () {
+  myGame.end()
   animateScore()
 
   // Changes button color
@@ -152,7 +158,6 @@ function clearCanvas () {
   if (!(gameCanvas === null)) document.body.removeChild(gameCanvas)
   // Set the content back to scroll
   document.body.style.overflow = 'scroll'
-  myGame.end()
 }
 
 class Game {
