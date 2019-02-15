@@ -3,16 +3,21 @@ var playing = false
 
 setInterval(insertGameButton, 1000)
 function insertGameButton () {
-  let topLevelButtons = document.getElementById('top-level-buttons')
-  let nodes = topLevelButtons.childNodes
-  if (nodes.length !== 0 && nodes[2].id !== 'gameToggleButton') {
-    addGameButton()
+  let content = document.getElementById('menu-container').firstChild
+  let tlb = content.firstChild
+  let other = tlb.childNodes[1]
+  console.log(other)
+  //let topLevelButtons = document.getElementById('top-level-buttons')
+  let nodes = other.childNodes
+  console.log(nodes.length)
+  if (nodes.length >= 3 && nodes[2].id !== 'gameToggleButton') {
+    addGameButton(other)
     document.body.append(playerScore)
   }
 }
 
-function addGameButton () {
-  let topLevelButtons = document.getElementById('top-level-buttons')
+function addGameButton (topLevelButtons) {
+  //let topLevelButtons = document.getElementById('top-level-buttons')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
