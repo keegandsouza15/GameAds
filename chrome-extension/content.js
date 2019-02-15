@@ -11,10 +11,6 @@ function insertGameButton () {
   }
 }
 
-function test () {
-  console.log('test')
-}
-
 function addGameButton () {
   let topLevelButtons = document.getElementById('top-level-buttons')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
@@ -142,7 +138,6 @@ function animateScore () {
       clearInterval(delayInterval)
       playerScore.style.top = 800 + 'px'
       playerScore.style.display = 'none'
-
     }
   }
 }
