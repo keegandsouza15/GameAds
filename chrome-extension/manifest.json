@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name" : "Test Chrome Extension",
+  "name" : "Youtube Game",
   "version" : "0.2",
   "browser_action": {
     "default_icon": "icon.png"
