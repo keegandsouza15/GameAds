@@ -1,5 +1,6 @@
 var myGame = false
 var playing = false
+console.log('here')
 
 setInterval(insertGameButton, 1000)
 function insertGameButton () {
@@ -12,7 +13,6 @@ function insertGameButton () {
   let nodes = topLevelButtons.childNodes
   if (nodes.length >= 3 && nodes[2].id !== 'gameToggleButton') {
     addGameButton(topLevelButtons)
-    document.body.append(playerScore)
   }
 }
 
@@ -66,23 +66,23 @@ function gameButtonClick () {
   (playing) ? drawCanvas() : clearCanvas()
 }
 
-// Creates the score display element
-var playerScore = document.createElement('p')
-playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:2px; border-color:#ff0000')
-playerScore.setAttribute('id', 'game-score')
-playerScore.style.display = 'none'
-playerScore.style.position = 'absolute'
-playerScore.style.top = 800 + 'px'
-playerScore.style.left = 700 + 'px'
-playerScore.innerHTML = 0
-document.body.append(playerScore)
+function drawScore (newCanvas) {
+  // Add the score
+  console.log('addScoreText is being called')
+  var playerScore = document.createElement('p')
+  playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:4px; border-color:#ff0000; background-color:white;')
+  playerScore.setAttribute('id', 'game-score')
+  playerScore.style.display = 'inline'
+  playerScore.style.position = 'absolute'
+  playerScore.style.top = parseInt(newCanvas.style.top) + parseInt(newCanvas.height) + 'px'
+  playerScore.style.left = parseInt(newCanvas.style.left) + (parseInt(newCanvas.width) / 2) + 'px'
+  playerScore.innerHTML = 0
+  return playerScore
+}
 
 function drawCanvas () {
   // Scroll to the top and display the player score
   document.documentElement.scrollTop = 0
-  playerScore.style.top = 800 + 'px'
-  playerScore.style.left = 700 + 'px'
-  playerScore.style.display = 'inline'
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', '#ff0000')
   // Find the youtube movie player
@@ -107,6 +107,10 @@ function drawCanvas () {
   ctx.fillStyle = 'black'
   ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
   document.body.append(newCanvas)
+
+  var playerScore = drawScore(newCanvas)
+  document.body.append(playerScore)
+
   // Initizale the game
   myGame = new Game(newCanvas.width, newCanvas.height, ctx, playerScore)
   myGame.start()
@@ -120,15 +124,14 @@ function drawCanvas () {
   document.body.style.overflow = 'hidden'
 }
 
-function animateScore () {
-  playerScore.style.background = 'white'
-  var id = setInterval(frame, 2)
+function animateScore (playerScore) {
+  var id = setInterval(frame, 1)
   var pos = parseInt(playerScore.style.top)
   let delayInterval = null
   function frame () {
     if (playing) {
       clearInterval(id)
-      playerScore.style.display = 'inline'
+      document.body.removeChild(playerScore)
       return
     }
     if (pos <= 350) {
@@ -140,15 +143,15 @@ function animateScore () {
     }
     function delay () {
       clearInterval(delayInterval)
-      playerScore.style.top = 800 + 'px'
-      playerScore.style.display = 'none'
+      document.body.removeChild(playerScore)
     }
   }
 }
 
 function clearCanvas () {
   myGame.end()
-  animateScore()
+  //removeScore(myGame.scoreElement)
+  animateScore(myGame.scoreElement)
 
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', 'hsl(0, 0%, 53.3%)')
