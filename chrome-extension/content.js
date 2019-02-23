@@ -1,6 +1,5 @@
 var myGame = false
 var playing = false
-console.log('here')
 
 setInterval(insertGameButton, 1000)
 function insertGameButton () {
@@ -17,6 +16,7 @@ function insertGameButton () {
 }
 
 function addGameButton (topLevelButtons) {
+  console.log('add button revamp')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
@@ -68,7 +68,6 @@ function gameButtonClick () {
 
 function drawScore (newCanvas) {
   // Add the score
-  console.log('addScoreText is being called')
   var playerScore = document.createElement('p')
   playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:4px; border-color:#ff0000; background-color:white;')
   playerScore.setAttribute('id', 'game-score')
@@ -150,7 +149,6 @@ function animateScore (playerScore) {
 
 function clearCanvas () {
   myGame.end()
-  //removeScore(myGame.scoreElement)
   animateScore(myGame.scoreElement)
 
   // Changes button color
