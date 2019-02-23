@@ -16,7 +16,7 @@ function insertGameButton () {
 }
 
 function addGameButton (topLevelButtons) {
-  console.log('add button revamp')
+  console.log('add button revamp pushing from vs code')
   let youtubeToggleButtonRenderer = topLevelButtons.firstChild
   // Youtube toogle button renderer
   let youtubeToggleButtonRendererClone = youtubeToggleButtonRenderer.cloneNode(false)
