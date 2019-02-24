@@ -108,6 +108,7 @@ function drawCanvas () {
 }
 
 function animateScore (playerScore) {
+  console.log('Changing animatedScore')
   var id = setInterval(frame, 1)
   var pos = parseInt(playerScore.style.top)
   let delayInterval = null
