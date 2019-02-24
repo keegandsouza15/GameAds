@@ -44,23 +44,24 @@ function addGameButton (topLevelButtons) {
   path.setAttribute('d', 'M23 6H1v12h22V6zm-12 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z')
   // Insert before share button
   topLevelButtons.insertBefore(gameButton, topLevelButtons.childNodes[2])
+  // Creates and addes the score element
+  var playerScore = document.createElement('p')
+  playerScore.id = 'player-score'
+  playerScore.className += ' p-score'
+  document.body.append(playerScore)
 }
 function gameButtonClick () {
   playing = !playing;
   (playing) ? drawCanvas() : clearCanvas()
 }
 
-function drawScore (newCanvas) {
-  // Add the score
-  var playerScore = document.createElement('p')
-  playerScore.setAttribute('style', 'color:#065fd4; font-size:3rem; text-align:center; border-radius:50px; padding:20px; border-style:solid; border-width:4px; border-color:#ff0000; background-color:white;')
-  playerScore.setAttribute('id', 'game-score')
-  playerScore.style.display = 'inline'
-  playerScore.style.position = 'absolute'
+// Make the score appear in the corrent position
+function positionScore (playerScore, newCanvas) {
+  playerScore.classList.remove('scoreanimation')
   playerScore.style.top = parseInt(newCanvas.style.top) + parseInt(newCanvas.height) + 'px'
   playerScore.style.left = parseInt(newCanvas.style.left) + (parseInt(newCanvas.width) / 2) + 'px'
   playerScore.innerHTML = 0
-  return playerScore
+  playerScore.style.display = 'block'
 }
 
 function drawCanvas () {
@@ -91,8 +92,9 @@ function drawCanvas () {
   ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
   document.body.append(newCanvas)
 
-  var playerScore = drawScore(newCanvas)
-  document.body.append(playerScore)
+  // Moves and displays the score.
+  var playerScore = document.getElementById('player-score')
+  positionScore(playerScore, newCanvas)
 
   // Initizale the game
   myGame = new Game(newCanvas.width, newCanvas.height, ctx, playerScore)
@@ -107,34 +109,18 @@ function drawCanvas () {
   document.body.style.overflow = 'hidden'
 }
 
-function animateScore (playerScore) {
-  console.log('Changing animatedScore')
-  var id = setInterval(frame, 1)
-  var pos = parseInt(playerScore.style.top)
-  let delayInterval = null
-  function frame () {
-    if (playing) {
-      clearInterval(id)
-      document.body.removeChild(playerScore)
-      return
-    }
-    if (pos <= 350) {
-      clearInterval(id)
-      delayInterval = setInterval(delay, 1000)
-    } else {
-      pos = pos - 2
-      playerScore.style.top = pos + 'px'
-    }
-    function delay () {
-      clearInterval(delayInterval)
-      document.body.removeChild(playerScore)
-    }
-  }
-}
-
 function clearCanvas () {
   myGame.end()
-  animateScore(myGame.scoreElement)
+  // Handles the score animation
+  myGame.scoreElement.className += ' scoreanimation'
+  let count = 0
+  myGame.scoreElement.addEventListener('animationend', handleEnd, false)
+  function handleEnd () {
+    if (count === 1) {
+      myGame.scoreElement.style.display = 'none'
+    }
+    count++
+  }
 
   // Changes button color
   document.getElementById('game-icon-svg').setAttribute('fill', 'hsl(0, 0%, 53.3%)')
